@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<title>Mikrofonbeamforming</title>
+<meta name="author" content="Matthias Brandt"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="./libs/reveal.js/dist/reveal.css"/>
+
+<link rel="stylesheet" href="./libs/reveal.js/dist/theme/white.css" id="theme"/>
+
+<link rel="stylesheet" href="./css/standard.css"/>
+<link rel="stylesheet" href="./libs/reveal.js/plugin/highlight/zenburn.css"/>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<script src="./animations/weights/beampattern.js"></script>
+<script src="./animations/main/SliderWithLabel.js"></script>
+<script src="./animations/weights/weights_app.js"></script>
+<script src="./animations/main/main_app.js"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide">
+<section id="sec-title-slide" data-state="no-toc-progress"><h1 class="no-toc-progress">Mikrofonbeamforming</h1><h3>Prinzipien und Funktionsweise</h3><aside class="notes">
+<ul>
+<li>Ich <span class="underline">begruesse</span> Sie zu meinem Lehrvortrag und freue mich sehr, dass ich hier sein darf, und dass Sie so zahlreich erschienen sind.</li>
+<li>Mein Name ist <span class="underline">Matthias Brandt</span> ich habe im Bereich <span class="underline">digitale Signalverarbeitung promoviert</span> und ich werde heute eine Einfuehrung in Mikronbeamforming geben.</li>
+<li>Ich habe mir Ihre <span class="underline">Lehrplaene angesehen</span> und sie die hier sitzen sollten alle benoetigten Vorlesungen in Mathematik, Physik, Akustik und Signalverarbeitung gehoert haben und wissen damit genug, um zu verstehen, ueber was ich sprechen werde.</li>
+<li>Es geht also um Mikrofonbeamforming. Anders formuliert koennte man sagen: <span class="underline">Beamforming mit Mikrofonsignalen</span>.</li>
+<li>Mikrofone kennen Sie, wir fokussieren uns also auf Beamforming.</li>
+<li>Gleich am Anfang nenne ich Ihnen jetzt schonmal den wichtigsten Begriff dieses Vortrags. Wenn Sie sich nur eine Sache merken, dann sollte es sein, dass&#x2026;
+<ul>
+<li><span class="underline">Beamformer <i>raeumliche Filter</i> sind</span>.</li>
+<li>Sie kennen Filter, die bestimmte Frequenzbereiche in einem Signal verstaerken oder abschwaechen.</li>
+<li>Beamformer sind Filter, die Signale <i>in Abhaengigkeit der Richtung</i> abschwaechen.</li>
+
+</ul></li>
+<li>Meine <span class="underline">Ziele fuer heute</span> sind, dass Sie verstanden haben:
+<ul>
+<li>Was sind die <span class="underline">Bestandteile eines Mikrofonbeamformers</span>?</li>
+<li>Wie wird <span class="underline">Interferenz</span> genutzt um raeumliche Filterung zu ermoeglichen</li>
+<li><span class="underline">Frequenzabhaengigkeit</span> des Filter-Verhaltens</li>
+<li><span class="underline">Beam-Pattern</span></li>
+<li><span class="underline">Steering</span></li>
+<li><span class="underline">Anwendungen</span></li>
+
+</ul></li>
+<li>Wir werden uns die verschiedenen Aspekte <span class="underline">zunaechst intuitiv</span> betrachten, dann die <span class="underline">mathematische Formulierung</span> ansehen</li>
+<li>Als erstes werden wir uns ansehen, aus was ein Mikrofonbeamformer besteht.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<style type="text/css">
+.reveal .slides { text-align: left; }
+.reveal .slides .section>* { margin-left: 0; margin-right: 0; }
+</style>
+<!-- <script src="https://d3js.org/d3.v3.min.js"></script> -->
+<!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
+<script src="./libs/reveal.js/plugin/animate/plugin.js"></script>
+<script src="./libs/reveal.js/plugin/animate/svg.min.js"></script>
+<section>
+<section id="slide-orgc1bda54">
+<h2 id="orgc1bda54">Bestandteile eines Beamformers</h2>
+
+<div id="org2cdb855" class="figure">
+<p><img src="./bilder/beamformer/beamformer_components2_1.svg" alt="beamformer_components2_1.svg" class="org-svg" style="height:500px;" />
+</p>
+</div>
+
+<ul>
+<li>\(M\):  Anzahl der Mikrofone</li>
+<li>SV: Signalverarbeitung</li>
+<li>\(x_m(t)\): Signal von Mikrofon \(m\)</li>
+<li>\(y(t)\): Ausgangssignal</li>
+
+</ul>
+
+<aside class="notes">
+<ul>
+<li>Hier sehen wir die <font color="red"> Bestandteile eines Beamformers</font>:</li>
+<li>Als erstes gibt es ein sogenanntes <font color="red"> Mikrofon-Array</font>
+<ul>
+<li>&bdquo;Array&ldquo; bedeutet, es gibt nicht nur ein Mikrofon sondern mehrere.</li>
+<li>Das kennen Sie von Lautsprecher Arrays</li>
+<li>Konkret sind es hier M Mikrofone &#x2013; numeriert von 0 bis M-1.</li>
+<li>Wir könnten auch bei 1 anfangen zu zählen, aber 0 ist üblich und macht die Mathematik an ein paar Stellen einfacher.</li>
+
+</ul></li>
+<li>Als zweites gibt es hier einen <font color="red"> Block "SV"</font> &#x2013; das steht für &bdquo;Signalverarbeitung&ldquo;
+<ul>
+<li>Das bedeutet, wir machen etwas mit den Mikrofonsignalen, um das Ausgangssignal zu erhalten</li>
+
+</ul></li>
+<li>Es ist zu sehen: Die Ausgangssignale von mehreren Mikrofonen werden irgendwie  verarbeitet, und wir erhalten <i>ein</i> Ausgangssignal</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org3d890d6">
+<h2 id="org3d890d6">Uniform Line Array</h2>
+
+<div id="org09b5668" class="figure">
+<p><img src="./bilder/beamformer/beamformer_components6_3.svg" alt="beamformer_components6_3.svg" class="org-svg" />
+</p>
+</div>
+<aside class="notes">
+<ul>
+<li>Um unsere <font color="red"> Betrachtung übersichtlicher</font> zu gestalten möchten wir nicht, dass die Mikrofone irgendwie im Raum verteilt sind&#x2026;</li>
+<li>sondern sie sind in einer <font color="red"> Linie aufgereiht</font></li>
+<li>Deswegen heißt es &bdquo;Line Array&ldquo;. Das kennen sie vielleicht von Lautsprechern &#x2013; da gibt es auch &bdquo;Line Arrays&ldquo;.</li>
+<li>Zusätzlich haben die Mikrofone den <font color="red"> gleichen Abstand</font> voneinander.</li>
+<li>Dafür steht das &bdquo;Uniform&ldquo; &#x2013; also gleichmäßig</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org8806374">
+<h2 id="org8806374">Ebene Schallwellen</h2>
+
+<div id="org73d26e8" class="figure">
+<p><img src="./bilder/beamformer/beamformer_components6_4.svg" alt="beamformer_components6_4.svg" class="org-svg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Jetzt fügen wir eine <font color="red"> Schallquelle</font> hinzu &#x2013; hier, und im Folgenden in <font color="red"> grün</font> markiert</li>
+<li>Eine weitere Annahme, die wir machen, ist, dass wir uns im <font color="red"> Fernfeld</font> der Quelle befinden.</li>
+<li><font color="red"> [An Tafel anmalen]</font></li>
+<li>Auf unsere Mikrofonarray treffen nun also <font color="red"> ebene Schallwellen</font>.</li>
+<li>Das ist hier mit einer <font color="red"> grünen Wellenfront</font>, die sich auf unser Array zubewegt, angedeutet.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgbc8cd5a">
+<h2 id="orgbc8cd5a">Signallaufzeiten</h2>
+
+<div id="org4d5f622" class="figure">
+<p><img src="./bilder/beamformer/beamformer_components6_6.svg" alt="beamformer_components6_6.svg" class="org-svg" />
+</p>
+</div>
+<aside class="notes">
+<ul>
+<li>Um die Funktionsweise des Arrays zu verstehen, brauchen wir <font color="red"> ein paar Variablen</font></li>
+<li>Eine Variable, die sich durch den gesamten Vortrag ziehen wird, ist <font color="red"> $\tau_p$</font>.</li>
+<li>Der griechische Buchstabe \(\tau\) wird <font color="red"> üblicherweise für Verzögerungen</font> verwendet.</li>
+<li>Auch hier geht es um eine Verzögerung.</li>
+<li>\(\tau_p\) gibt nämlich an, wie lange der von der Quelle kommende Schall benötigt, <font color="red"> um das nächste Mikrofon zu erreichen</font>.</li>
+<li>Im Beispiel hier erreicht der Schall zuerst Mikrofon Null. Um dort von der Quelle anzukommen hat er eine gewisse Zeit gebraucht &#x2013; hier in der oberen blauen Markierung zu sehen.</li>
+<li>Sobald er Mikrofon 0 erreicht hat wird nun die Zeit \(\tau_p\) benötigt, um Mikrofon eins zu erreichen.</li>
+<li>Da die <font color="red"> Abstände der Mikrofone gleich</font> sind, wird gleichermaßen wieder \(\tau_p\) benötigt, um von Mikrofon 1 zu Mikrofon 2 zu gelangen.</li>
+<li>Im weiteren <font color="red"> interessiert uns nicht</font> &#x2013; Mikrofon 0 &#x2013; erreicht hat.</li>
+<li>Wir beschäftigen uns lediglich mit dem <font color="red"> Zeitunterschied zwischen dem ersten und den weiteren Mikrofonen</font>.</li>
+<li>Das erste Mikrofon wird deshalb auch als <font color="red"> /Referenzmikrofon/</font> bezeichnet.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgfff8c50">
+<h2 id="orgfff8c50">Beschränkung auf zwei Mikrofone</h2>
+
+<div id="orgf3bd885" class="figure">
+<p><img src="./bilder/beamformer/beamformer_components6_1.svg" alt="beamformer_components6_1.svg" class="org-svg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Ich habe eben gesagt, dass Beamformer <font color="red"> aus "mehreren" Mikrofonen</font> und der zugehörigen Signalverarbeitung besteht.</li>
+<li>Der einfachste Fall für &bdquo;mehrere&ldquo; ist zwei.</li>
+<li>Alles, was wir betrachten, lässt sich auf mehrere Mikrofone erweitern,</li>
+<li>aber die grundlegenden Prinzipien lassen sich am besten mit lediglich zwei Mikrofonen veranschaulichen.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org997cb42">
+<h2 id="org997cb42">Interferenz von Schallwellen</h2>
+<div id="main_app_1" style="width:1200px;height:400px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders_1" style="width:560px;height:300px;display:block;margin-left:auto;margin-right:auto;display:none;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+    let main_app_1 = new MainApp({target_main: "main_app_1", target_controls: "sliders_1", show_weights:false, show_delays: false, show_frequency:false})
+</script>
+
+<aside class="notes">
+<ul>
+<li>Links ist in grün unsere <font color="red"> Schallquelle</font> zu sehen &#x2013; sagen wir, eine Opernsängerin</li>
+<li>Der grüne Pfeil ist der sogenannte <font color="red"> "Propagation"-Vektor</font>. Ich benutze die englischen Begriffe, da sie überall in der Literatur verwendet werden.</li>
+<li>Schallsignale zeichnen sich dadurch aus, dass sie <font color="red"> in der Regel breitbandig</font> sind, also einen breiten Bereich an Frequenzen enthalten</li>
+<li>Um die Betrachtung zu vereinfachen nehmen wir erstmal an, dass unsere Opernsängerin einen <font color="red"> einzelnen Sinuston</font> singt</li>
+<li>Sie sehen, dass die von der Quelle ausgehenden Schallwellen <font color="red"> gleichzeitig auf unsere Mikrofone</font> treffen</li>
+<li>Die in blau gezeichneten Ausgangssignale der Mikrofone liegen deshalb <font color="red"> genau übereinander</font></li>
+<li>Wenn Sie sich an das letzte Bild erinnern werden die Mikrofonsignale in den <font color="red"> "Signalverarbeitung"-Block</font> geführt.</li>
+<li>Die Signalverarbeitung gibt es hier auch: Ein sehr einfacher Fall, wir <font color="red"> addieren</font> die Mikrofonsignale.</li>
+<li>Dabei kommt es zu einer vollständigen <font color="red"> konstruktiven Inteferenz</font>, und wir enhalten am Ausgang ein Sinussignal mit der <font color="red"> doppelten Amplitude</font></li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgf8a5f87">
+<h2 id="orgf8a5f87">Interferenz von Schallwellen</h2>
+<div id="main_app_2" style="width:1200px;height:400px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders_2" style="width:560px;height:200px;display:block;margin-left:auto;margin-right:auto;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+    let main_app_2 = new MainApp({target_main: "main_app_2", target_controls: "sliders_2", show_weights:true, show_delays: false, show_frequency:false})
+</script>
+
+<p>
+\(w_0 = w_1 = \tfrac{1}{2}\)
+</p>
+
+<aside class="notes">
+<ul>
+<li>Damit wir am Ausgang dieselbe Amplitude wie am Eingang bekommen führen wir <font color="red"> Gewichtungsfaktoren</font> für die Mikrofonsignale ein, a.</li>
+<li>Jetzt ist die Amplitude am Ausgang genauso groß wie am Eingang.</li>
+<li>Soweit erstmal unspektakulär&#x2026;</li>
+<li>Ich habe ganz am Anfang gesagt, dass Beamformer <font color="red"> /räumliche Filter/</font> sind, die Signale in Abhängigkeit der Richtung dämpfen.</li>
+<li>Sehen wir uns also an was passiert, wenn der Schall <font color="red"> nicht genau von vorne</font> auf unser Array trifft, sondern etwas <font color="red"> seitlich</font>.</li>
+<li>[Einfallsrichtung ändern] Wenn ich die Einfallsrichtung des Schalls ändere <font color="red"> ändert sich das Signal unseres Referenzmikrofons nicht</font>. Das liegt daran, dass wir ausschließlich den durch die Verzögerung verursachte Änderung im zweiten Mikrofon betrachten.</li>
+<li>Durch die Änderung der Einfallsrichtung wird das <font color="red"> zweite Mikrofonsignal verzögert</font>.</li>
+<li>Da unsere Opernsängerin einen reinen Sinuston singt entspricht die Verzögerung einer <font color="red"> Änderung der Phase</font>.</li>
+<li>Die Amplitude des Summensignals am Ausgang ändert sich in Abhängigkeit davon, wie gut die beiden Mikrofonsignale übereinanderliegen.</li>
+<li>Wenn der Schall von vorne kommt liegen sie genau übereinander und es kommt zu einer vollständigen konstruktiven Interferenz.</li>
+<li>Es gibt aber eine Richtung, bei der die Phasenänderung genau einer halben Periode entspricht.</li>
+<li>[Einstellen: 59°]</li>
+<li>Hier!</li>
+<li>Das ist die zweite Sache, die Sie sich zum Thema &bdquo;Beamformer&ldquo; merken sollten:&bdquo;
+<ul>
+<li><font color="red"> Beamformer basieren auf dem Prinzip der Interferenz</font>, um Schall richtungsabhängig entweder ungedämpft durchzulassen, oder vollständig zu unterdrücken.
+<ul>
+<li><font color="red"> Schall von vorne</font> trifft gleichzeitig auf alle Mikrofone und wird ungedämpft durchgelassen</li>
+<li><font color="red"> Schall aus seitlichen Richtungen</font> trifft verzögert auf die Mikrofone. Die dadurch verursachte Phasenänderung sorgt für Dämpfung.</li>
+
+</ul></li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-delay_calculation_1">
+<h2 id="delay_calculation_1">Berechnung des Zeitversatzes</h2>
+
+<div id="org7b354fc" class="figure">
+<p><img src="./bilder/beamformer/beamformer_delayCalculation4_1.svg" alt="beamformer_delayCalculation4_1.svg" class="org-svg" />
+</p>
+</div>
+<aside class="notes">
+<ul>
+<li>Okay, die <font color="red"> Verzögerung scheint wichtig</font> zu sein. Die müssen wir uns genauer ansehen.</li>
+<li>Erstmal müssen wir gucken, wie die <font color="red"> Verzögerung zum zweiten Mikrofon berechnet</font> werden kann.</li>
+<li>Wir haben gesehen, dass sie offenbar <font color="red"> vom Einfallswinkel abhängt</font>.</li>
+<li>Hier ist also wieder unser Array
+<ul>
+<li>Die Mikrofone sind jetzt durch rote Punkte verdeutlicht</li>
+<li>Außerdem ist die Mikrofonebene eingezeichnet</li>
+<li>Senkrecht darauf ist die Blickrichtung des Array eingezeichnet</li>
+<li>Wir brauchen den Abstand der Mikrofone. Der wird üblicherweise mit \(d\) bezeichnet</li>
+
+</ul></li>
+<li>Jetzt kommt die <font color="red"> Wellenfront</font>
+<ul>
+<li>Der <font color="red"> Einfallswinkel ist Theta</font>
+<ul>
+<li>Theta=0 entspricht also Schalleinfall direkt von vorne (<font color="red"> Broadside</font>)</li>
+<li>Theta=90 entspricht Schalleinfall von der Seite (<font color="red"> Endfire</font>)</li>
+
+</ul></li>
+
+</ul></li>
+<li>Ich habe eine zweite Wellenfront eingezeichnet, damit wir Winkel besser ablesen können.
+<ul>
+<li>Zu diesem Zeitpunkt hat die <font color="red"> vordere Wellenfront das oberste Mikrofon</font> erreicht
+<ul>
+<li>Der zweite grüne Winkel entspricht Theta
+<ul>
+<li>Heißt auch &bdquo;Normalwinkel&ldquo;</li>
+<li>Beide grünen Winkel sind also gleich</li>
+
+</ul></li>
+
+</ul></li>
+
+</ul></li>
+<li>Erster Schritt zur Berechnung des zeitlichen Versatzes ist, x zu bestimmen
+<ul>
+<li>Gibt es <font color="red"> Vorschläge</font>, wie wir das machen können,</li>
+<li>unter der Berücksichtigung der gezeigten Längen und Winkel?</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org52730f6">
+<h2 id="org52730f6">Berechnung des Zeitversatzes</h2>
+<div class="left-column" id="orge617b8f">
+
+<div id="orgb9b1e6b" class="figure">
+<p><img src="./bilder/beamformer/beamformer_delayCalculation4_1.svg" alt="beamformer_delayCalculation4_1.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+
+<p>
+Wegunterschied:
+</p>
+<div class="right-column" id="org959849c">
+<p>
+\[
+\color{blue}x = d \cdot \sin\left(\color{green}\theta\right)
+\]
+</p>
+
+<p>
+Schallgeschwindigkeit:
+\[
+c \approx 344 \tfrac{\text{m}}{\text{s}}
+\]
+</p>
+
+<p>
+Zeitversatz:
+\[\begin{eqnarray}
+%c &\approx & 344 \tfrac{\text{m}}{\text{s}}\\[2ex]
+\tau_\color{green}{p} &=& \frac{\color{blue}x}{c}\\
+ & = & \frac{d \cdot \sin\left(\color{green}\theta\right)}{c}
+\end{eqnarray}\]
+</p>
+
+</div>
+
+<aside class="notes">
+<ul>
+<li>Wir kennen Theta</li>
+<li>Wir kennen d</li>
+<li>Es handelt sich um ein <font color="red"> rechtwinkliges Dreieck</font></li>
+<li>Sinus ist das Verhältnis von <font color="red"> Gegenkathete zu Hypotenuse</font>,</li>
+<li>anders formuliert: \(x = d \sin \Theta\)</li>
+<li>Um eine Wegstrecke in eine Laufzeit umzurechnen benötigen wir die Geschwindigkeit des Schalls</li>
+<li>Hierzulande, unter durchschnittlichen Umständen &#x2013; die Schallgeschwindigkeit hängt unter anderem von Luftdruck und der Temperatur ab &#x2013; beträgt sie 344 m/s.</li>
+<li>Der zeitliche Versatz zwischen zwei Mikrofonen ergibt sich also zu \(\tau_p\)</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgc332241">
+<h2 id="orgc332241">Abhängigkeit von der Frequenz</h2>
+<div id="main_app_3" style="width:1200px;height:400px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders_3" style="width:560px;height:200px;display:block;margin-left:auto;margin-right:auto;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+    let main_app_3 = new MainApp({target_main: "main_app_3", target_controls: "sliders_3", show_weights:true, show_delays: false, show_frequency:true})
+</script>
+
+<aside class="notes">
+<ul>
+<li>In Abhängigkeit der Einfallsrichtung gibt es also einen <font color="red"> zeitlichen Versatz zwischen den Mikrofonen</font>.</li>
+<li>Jetzt könnte man fast denken: &bdquo;Super! Unser <font color="red"> Beamformer ist fertig</font>. Schall von vorne wird durchgelassen, Schall von der Seite gedämpft. Wahrscheinlich funktioniert es mit mehr als zwei Mikrofonen noch besser. Was soll schon schiefgehen&#x2026;?&ldquo;&bdquo;</li>
+<li>Dazu möchte ich Ihnen etwas zeigen.</li>
+<li>Ich habe einen <font color="red"> Regler für die Frequenz</font> hinzugefügt. Vielleicht ahnen Sie schon, worauf das hier hinausläuft&#x2026;</li>
+<li>Wenn der <font color="red"> Schall von vorne</font> kommt kann ist doch alles wunderbar:
+<ul>
+<li>Das Eingangssignal wird ungedämpft durchgelassen. Schön&#x2026;</li>
+
+</ul></li>
+<li>[Wieder 59° einstellen] Jetzt gucke ich mal was bei unseren 59° passiert, da wird ja vollständig gedämpft.</li>
+<li>Okay, jetzt mal die <font color="red"> Frequenz ändern</font>&#x2026;</li>
+<li>Oh, oh&#x2026; Wie kommt das?</li>
+<li><font color="red"> [An Tafel malen]</font> Naja, dieselbe Verzögerung führt bei unterschiedlichen Frequenzen zu anderen Phasenänderungen
+<ul>
+<li>Bei &#x2013; sagen wir &#x2013; 1 kHz sind 2&pi; das hier&#x2026;</li>
+<li>Bei &#x2013; sagen wir &#x2013; 100 Hz sind 2&pi; viel länger</li>
+<li>Dieselbe Verzögerung führt also <font color="red"> bei niedrigeren Frequenzen zu viel weniger Phasenänderung</font></li>
+<li>Und wir brauchen die Phasenänderung um destruktive Interferenz zu bekommen</li>
+
+</ul></li>
+<li><font color="red"> [Wieder zur Grafik]</font> Das sehen Sie hier
+<ul>
+<li><font color="red"> [Niedrige Frequenz einstellen]</font> Jetzt hat die Änderung der Einfallsrichtung kaum noch Auswirkungen auf die Amplitude des Ausgangssignals, da die Mikrofonsignale im Vergleich zur Wellenlänge kaum verschoben sind</li>
+<li><font color="red"> [Hohe Frequenz einstellen]</font> Bei hohen Frequenzen gibt es sogar mehrere Richtungen, in denen die Mikrofonsignale vollständig konstruktiv interferieren.</li>
+
+</ul></li>
+<li>Der <font color="red"> dritte Punkt</font>, den Sie sich zum Thema &bdquo;Beamformer&ldquo; merken sollen ist:</li>
+<li>Offenbar ist die Richtwirkung frequenzabhängig!
+<ul>
+<li>Bei niedrigen Frequenzen gibt es wenig Richtwirkung</li>
+<li>Bei hohen Frequenzen gibt es mehrere Richtungen, aus denen das Signal ungedämpft durchgelassen wird</li>
+
+</ul></li>
+<li>Um das genauer zu betrachten müssen wir <font color="red"> rechnen</font>&#x2026;</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-frequency_domain_1">
+<h2 id="frequency_domain_1">Mikrofonsignal</h2>
+<div class="left-column" id="orga42e601">
+<p>
+Zeitbereich, Signal von Mikrofon \(m\):
+</p>
+<div>
+  \begin{eqnarray}
+  x_m\left(t\right) &= & \color{green}{s}\left(t - m\cdot\tau_\color{green}{p}\right)\\
+% & = & \color{green}{s}(t)\ast \delta(t - m \cdot \tau)
+\end{eqnarray}
+
+</div>
+<p>
+mit
+</p>
+<ul>
+<li>\(\color{green}{s}\): Signal der Quelle am Referenzmikrofon</li>
+<li>\(m\): Mikrofonindex</li>
+<li>\(t\): Zeit (in s)</li>
+<li>\(\tau_\color{green}{p}\): Zeitversatz zwischen benachbarten Mikrofonen (in s)</li>
+
+</ul>
+
+</div>
+
+<div class="fragment right-column" id="org2caef9a">
+<p>
+Frequenzbereich:
+</p>
+<div>
+\begin{eqnarray}
+X_m(\omega) & = & \mathcal{F}\left\{x_m\left(t\right)\right\}\\
+& = & \mathcal{F}\left\{\color{green}{s}\left(t - m\cdot \tau_\color{green}{p} \right)\right\}\\
+% & = & \mathcal{F}\left\{\color{green}{s}(t)\ast \delta(t - m \cdot \tau_\color{green}{p})\right\}\\
+& = & \color{green}{S}\left(\omega\right)\cdot e^{-j\omega\cdot m\cdot\tau_\color{green}{p}}
+\end{eqnarray}
+
+</div>
+<p>
+mit
+</p>
+<ul>
+<li>\(X_m\): Spektrum von \(x_m\)</li>
+<li>\(\color{green}{S}\): Spektrum vom Referenzsignal</li>
+<li>\(\omega\): Frequenz</li>
+
+</ul>
+
+</div>
+
+
+<aside class="notes">
+<ul>
+<li>Jetzt formalisiert:
+<ul>
+<li>s ist das <font color="red"> Signal der Quelle (wenn sie das Referenzmikrofon erreicht)</font></li>
+<li>x<sub>m</sub> ist das Signal von Mikrofon m</li>
+<li>tau ist die Verzögerung, durch Einfall aus einer bestimmten Richtung</li>
+<li>Das heißt: Unser m-tes Mikrofonsignal ist das Signal der Quelle am Referenzmikrofon, verzögert um m mal &tau;.
+<ul>
+<li>Als Beispiel: Das Signal vom 0-ten Mikrofon ist natürlich das Signal s selber, da m=0 und es gibt keine Verzögerung.</li>
+<li>Das Signal am nächsten Mikrofon ist um \(\tau_p\) verzögert &#x2013; das haben wir eben gesehen.</li>
+<li>Das Signal vom zweiten Mikrofon ist um \(\2\tau_p\) verzögert, und so weiter.</li>
+
+</ul></li>
+
+</ul></li>
+<li>Wie sieht das ganze nun im <font color="red"> Frequenzbereich</font> aus?
+<ul>
+<li>Die Gleichung auf der linken Seite wird fourier-transformiert</li>
+<li>Groß X<sub>m</sub> ist das Spektrum vom Mikrofonsignal m</li>
+<li>Omega ist die Frequenz</li>
+<li>Ist Ihnen klar, wie die dritte Zeile zustande kommt? Woher kommt dieser komplexe Exponentialterm?</li>
+
+</ul></li>
+<li>Na klar: Einer <font color="red"> Verzögerung im Zeitbereich entspricht eine Multiplikation mit einer komplexen Exponentiellen</font> &#x2013; das ist eine der Identitäten der Fourier-Transformation. Das haben Sie sicherlich in der Vorlesung zur Signalverarbeitung gelernt.</li>
+<li>Das <font color="red"> Spektrum vom m-ten Mikrofonsignal</font> entspricht also der Multiplikation des Spektrums von S &#x2013; unserem Signal am Referenzmikrofon &#x2013; mit einem komplexen Exponentialterm. Das bedeutet, dass die Phase des Signals in Abhängigkeit von der Frequenz gedreht wird. Die Amplitude bleibt gleich &#x2013; der Betrag dieses Exponentialterms ist 1. Auch das ist Ihnen sicherlich geläufig.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-output_signal_1">
+<h2 id="output_signal_1">Ausgangssignal</h2>
+<div class="left-column" id="org73fe75d">
+<p>
+Zeitbereich:
+</p>
+<div>
+  \begin{eqnarray}
+  y\left(t\right) &= & \sum_{m=0}^{M-1}w_m\cdot x_m(t)\\
+& = & \sum_{m=0}^{M-1}w_m\cdot \color{green}{s}(t - m\cdot \tau_\color{green}{p})
+% & = & \color{green}{s}(t)\ast \delta(t - m \cdot \tau)
+% & = & \mathbf{w}^T \mathbf{x}(t)
+\end{eqnarray}
+
+</div>
+<p>
+mit
+</p>
+<ul>
+<li>\(w_m\): Gewichtungsfaktor für Mikrofonsignal \(m\)</li>
+
+</ul>
+
+</div>
+
+
+<div class="fragment right-column" id="orgdcc6ef8">
+<p>
+Frequenzbereich:
+</p>
+<div>
+\begin{eqnarray}
+Y(\omega) & = & \mathcal{F}\left\{y\left(t\right)\right\}\\
+& = & \mathcal{F}\left\{\sum_{m=0}^{M-1}w_m\cdot \color{green}{s}(t - m\cdot \tau_\color{green}{p})\right\}\\
+% & = & \sum_{m=0}^{M-1}\\
+% & = & \mathcal{F}\left\{\sum_{m=0}^{M-1}w_m\cdot x_m(t)\right\}\\
+% & = & \mathcal{F}\left\{\color{green}{s}(t)\ast \delta(t - m \cdot
+% \tau_\color{green}{p})\right\}\\
+% & = & \sum_{m=0}^{M-1}w_m\cdot X_m(t)\right
+
+& = & \color{green}{S}(\omega)\cdot \sum_{m=0}^{M-1}w_m \cdot e^{-j\omega\cdot m \cdot \tau_\color{green}{p}}\\
+%  & = & \color{green}{S}\left(\omega\right)\cdot \mathbf{w}^T\mathbf{\color{green}{p}}(\omega)\\
+\end{eqnarray}
+
+</div>
+
+<p>
+mit
+</p>
+<ul>
+<li>\(X_m\): Spektrum von \(x_m\)</li>
+<li>\(\color{green}{S}\): Spektrum vom Referenzsignal</li>
+<li>\(\omega\): Frequenz</li>
+
+</ul>
+
+</div>
+<aside class="notes">
+<ul>
+<li>Betrachten wir nun das <font color="red"> Ausgangssignal</font> des Beamformers</li>
+<li>Die gewichteten Mikrofonsignale werden addiert um das Ausgangssignal zu erhalten</li>
+<li>Im Frequenzbereich ergibt sich folgender Zusammenhang:
+<ul>
+<li>Das Spektrum des Ausgangssignals ist das Spektrum unseres Referenzsignals an Mikrofon 0, multipliziert mit der Summe von gewichteten Exponentialtermen</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-transfer_function">
+<h2 id="transfer_function">Übertragungsfunktion des Beamformers</h2>
+<div>
+\begin{eqnarray}
+Y(\omega) & = & \color{green}{S}(\omega)\cdot \sum_{m=0}^{M-1}w_m \cdot e^{-j\omega\cdot m \cdot \tau_\color{green}{p}}\\
+%Y(\omega) & = & \frac{1}{M}\sum_{m=0}^{M-1}S(\omega)\cdot e^{-j\omega\cdot m\cdot\tau_p}\\
+% & = & \frac{1}{M} S(\omega)\cdot \sum_{m=0}^{M-1}e^{-j\omega\cdot m\cdot\tau_p}
+\end{eqnarray}
+
+</div>
+
+<p>
+Mit \(w_m = \frac{1}{M}\):
+</p>
+<div>
+\begin{eqnarray}
+Y(\omega) & = & \frac{1}{M}\cdot\color{green}{S}(\omega) \sum_{m=0}^{M-1} e^{-j\omega\cdot m\cdot\tau_\color{green}{p}}\\
+% & = & \frac{1}{M} S(\omega)\cdot \sum_{m=0}^{M-1}e^{-j\omega\cdot m\cdot\tau_p}
+\end{eqnarray}
+
+</div>
+
+<p>
+Verhältnis von Ausgang zu Eingang:
+\[
+H(\omega)  =  \frac{Y(\omega)}{\color{green}{S}(\omega)}
+ = \bbox[5px, border: 2px solid green]{\frac{1}{M}\sum_{m=0}^{M-1}e^{-j\omega\cdot m\cdot\tau_\color{green}{p}}}
+\]
+</p>
+
+<aside class="notes">
+<ul>
+<li>Das Ergebnis von der letzten Folie können wir etwas <font color="red"> vereinfachen</font></li>
+<li>Unter der Berücksichtichtigung der Tatsache, dass wir unsere Gewichte w<sub>m</sub> bisher so gewählt haben, dass bei Schalleinfall von vorne die Amplitude nicht verändert wird, also mit &#x2026; können wir etwas vereinfachen</li>
+<li>Was nutzt man um das Verhalten eines (linearen) Systems im Frequenzbereich zu beschreiben?</li>
+<li>Die <font color="red"> Übertragungsfunktion</font></li>
+<li>Da kommt dieser Ausdruck heraus</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-beampattern_examples">
+<h2 id="beampattern_examples">Beam-Pattern &#x2013; Frequenz- &amp; Richtungsabhängigkeit</h2>
+<p>
+\[
+H(\omega) = \frac{1}{M}\sum_{m=0}^{M-1}e^{-j\omega\cdot m\cdot\tau_\color{green}{p}}
+\]
+</p>
+
+<p>
+mit \(\tau_\color{green}{p} = \frac{d\cdot \sin \left(\color{green}{\Theta}\right)}{c}\):
+</p>
+
+<p>
+\[
+H(\omega, \color{green}{\Theta}) = \frac{1}{M}\sum_{m=0}^{M-1}e^{-j\omega\cdot m\cdot\frac{d\cdot \sin \left(\color{green}{\Theta}\right)}{c}}
+\]
+</p>
+
+<aside class="notes">
+<ul>
+<li>Wie haben herausgefunden, dass die <font color="red"> Richtwirkung</font> von Beamformern von der Frequenz abhängt, aber natürlich &#x2013; darum geht es ja in erster Linie &#x2013; auch vom Einfallswinkel.</li>
+<li>Diese Abhängigkeit können wir in unsere Übertragungsfunktion aber <font color="red"> leicht einbauen</font>. Wir wissen ja, wie die Verzögerung vom Einfallswinkel abhängt.</li>
+<li>So nämlich.</li>
+<li>Jetzt haben wir die Übertragungsfunktion unseres Beamformers, in <font color="red"> Abhängigkeit von der Frequenz und vom Einfallswinkel</font>.</li>
+<li>Das nennt man <font color="red"> "Beam-Pattern"</font></li>
+<li>Üblicherweise wird der <font color="red"> Betrag</font> gezeichnet</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org9c147c9">
+<h2 id="org9c147c9">Frequenzabhängigkeit</h2>
+<div class="left-column" id="org251c73c">
+<ul>
+<li>2 Mikrofone</li>
+<li>20 cm Mikrofonabstand (\(d=0,2\))</li>
+
+</ul>
+
+
+<div id="orge474084" class="figure">
+<p><img src="./plots/beamPattern_twoMicrophones_frequencyDependence_cartesian.svg" alt="beamPattern_twoMicrophones_frequencyDependence_cartesian.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+<div class="right-column" id="org2ceb3c3">
+
+<div id="org6d52100" class="figure">
+<p><img src="./plots/beamPattern_twoMicrophones_frequencyDependence_polar.svg" alt="beamPattern_twoMicrophones_frequencyDependence_polar.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+<aside class="notes">
+<ul>
+<li>Hier sehen wir <font color="red"> Beispiele für Beam-Pattern</font></li>
+<li>Auf der linken Seite in <font color="red"> kartesischen Koordinaten</font>,
+<ul>
+<li>auf der x-Achse ist der <font color="red"> Einfallswinkel</font> aufgetragen</li>
+<li>das geht von -90° bis 90°</li>
+<li>Der Bereich ist also auf eine <font color="red"> Halbebene</font> beschränkt. Das liegt daran, dass das Beam-Pattern für die Rückseite des Arrays genauso aussieht wie das Beam-Pattern wenn der Schall von der vorderen Seite kommt.</li>
+<li>Auf der y-Achse ist die <font color="red"> Verstärkung des Arrays</font> aufgetragen. Da das Array das Signal nicht verstärkt, sondern lediglich dämpft ist das Maximum bei 0 dB.</li>
+
+</ul></li>
+<li>dieselben Informationen sind auf dem <font color="red"> Polardiagramm</font> auf der rechten Seite gezeigt</li>
+<li>Das kennen sie zum Beispiel von den <font color="red"> Richtcharacteristiken von Mikrofonen</font>.
+<ul>
+<li>Auf dem <font color="red"> Umfang dieses Halbkreises</font> ist der Einfallswinkel gezeigt</li>
+<li>Je größer der <font color="red"> Radius einer Kurve</font> ist, desto weniger dämpft der Beamformer das Signal aus dieser Richtung.</li>
+
+</ul></li>
+<li>Wie wir schon gesehen haben <font color="red"> hängt die Richtwirkung von der Frequenz ab</font>.</li>
+<li>Das erkennen wir hier in den Beam-Pattern für unterschiedliche Frequenzen.</li>
+<li>Die gezeigten Frequenzen sind-
+<ul>
+<li><font color="red"> 500 Hz</font> (blaue Kurve)</li>
+<li><font color="red"> 1000 Hz</font> (orangene Kurve)</li>
+<li><font color="red"> 4000 Hz</font> (grüne Kurve)</li>
+
+</ul></li>
+<li>Wir hatten gesehen, dass es für <font color="red"> tiefe Frequenzen</font> kaum Richtwirkung gibt. Das sehen wir hier. Unabhängig vom Einfallswinkel ist die Richtwirkung gering.</li>
+<li>Für 1 kHz sehen wir dass es auf der einen Seite einen Bereich um Null Grad Einfallsrichtung gibt, in dem das Signal stärker gedämpft wird, je weiter die Einfallsrichtung sich zur Seite ändert. Dieser Bereich um einen Einfall von Null Grad wird <font color="red"> Hauptkeule</font> genannt &#x2013; auf Englisch &bdquo;Main Lobe&ldquo;. Andererseits sehen wir, dass es zu vollständiger Unterdrückung des Signals aus ca. 60° Einfallsrichtung kommt. Wird die Einfallsrichtung weiter nach außen geändert wird die Dämpfung wieder geringer - die Mikrofonsignale überlagern sich nicht mehr mit vollständig destruktiver Interferenz. Diese Nebenmaxima im Beam-Pattern werden <font color="red"> "Side-Lobes"</font> genannt. Das sind also Bereiche, die nur wenig gedämpft werden.</li>
+<li>Für 4 kHz sieht das Pattern auffällig aus. Neben der Hauptkeule gibt es sehr ählich aussehende Maxima im Beam-Pattern. Das sind keine Side-Lobes &#x2013; wie bei 1 kHz. Das sind sogenannte <font color="red"> "Grating-Lobes"</font>. Grating Lobes sind Nebenkeulen, die das Signal nicht dämpfen &#x2013; genau wie beim Schalleinfall von vorne.</li>
+<li>Grating-Lobes sind eine <font color="red"> große Herausforderung</font> bei der Entwicklung von Beamformern, da sie die Richtwirkung stark beeinträchtigen.</li>
+<li>Diese drei Phänomene:
+<ul>
+<li><font color="red"> Wenig Richtwirkung</font> bei niedrigen Frequenzen</li>
+<li><font color="red"> Sidelobes</font> und</li>
+<li><font color="red"> Grating Lobes</font></li>
+
+</ul></li>
+<li>sehen wir uns jetzt noch einmal etwas genauer an, um ein Gefühl für deren Entstehung zu entwickeln.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org89078ae">
+<h2 id="org89078ae">Frequenzabhängigkeit</h2>
+<div id="main_app_4" style="width:1200px;height:400px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders_4" style="width:560px;height:200px;display:block;margin-left:auto;margin-right:auto;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+    let main_app_4 = new MainApp({target_main: "main_app_4", target_controls: "sliders_4", show_weights:true, show_delays: false, show_frequency:true})
+</script>
+
+<aside class="notes">
+<ul>
+<li>Hier sehen wir wieder unsere bekannte Grafik.</li>
+<li>Eben hatten wir gesehen, dass es bei niedrigen Frequenzen wenig Richtwirkung gibt</li>
+<li>[Niedrige Frequenz einstellen] Wenig Richtwirkung zeigen</li>
+<li>[1 kHz einstellen] Sidelobes zeigen</li>
+<li>[4 kHz einstellen] Grating Lobes zeigen</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgee5a9d7">
+<h2 id="orgee5a9d7">2d Beam-Pattern</h2>
+<p>
+Frequenz- und Richtungsabhängigkeit in einem Bild:
+<img src="./plots/beampattern_2d.svg" alt="beampattern_2d.svg" class="org-svg" />
+</p>
+
+<aside class="notes">
+<ul>
+<li>Da der <font color="red"> Zusammenhang zwischen Frequenz und Richtung</font> bei Beamformern so wichtig ist, werden Beam-Pattern häufig zweidimensional gezeichnet.</li>
+<li>Auf der x-Achse sehen wir wieder den Einfallswinkel</li>
+<li>Auf der y-Achse ist die Frequenz angegeben</li>
+<li>Die Verstärkung des Arrays ist farblich codiert: Dunkle Blautöne entsprechen 0 dB &#x2013; also weder Dämpfung noch Verstärkung. Die Farbe wechselt über grün und gelb zu rot, wodurch starke Dämpfung angezeigt wird.</li>
+<li>Hier können wir verschiedene Informationen erkennen:
+<ul>
+<li>Zum Beispiel hatten wir gesehen, dass Schall, der <font color="red"> direkt von vorne</font> auf das Array trifft, für alle Frequenzen unbeeinträchtigt durchgelassen wird. [zeigen]</li>
+<li>Außerdem können wir sehen, dass es für <font color="red"> tiefe Frequenzen</font> keinerlei Richtwirkung gibt. [zeigen]</li>
+<li>Die <font color="red"> Hauptkeule</font> &#x2013; oder Main-Lobe &#x2013; ist der blaue Streifen in der Mitte [zeigen]</li>
+<li><font color="red"> Side-Lobes</font> sind grüne Bereiche mittlerer Dämpfung bei seitlichem Einfall</li>
+<li>Die anderen dunkelblaue Streifen sind die <font color="red"> Grating-Lobes</font>.
+<ul>
+<li>Wir sehen, dass die Anzahl der Side- und Grating-Lobes zunimmt je höher die Frequenz wird</li>
+
+</ul></li>
+
+</ul></li>
+<li>Insgesamt: 2d-Beam-Pattern liefern eine <font color="red"> umfangreiche Aussage</font> über die Richtwirkung eines Beamformers.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org5a4a649">
+<h2 id="org5a4a649">3d Beam-Pattern</h2>
+
+<div id="org4da174d" class="figure">
+<p><img src="./plots/beampattern_3d.svg" alt="beampattern_3d.svg" class="org-svg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Hier habe ich das letzte Bild etwas anders geplottet.</li>
+<li>Diesmal ist die Dämpfung nicht nur farblich codiert, sondern noch als Oberfläche auf der z-Achse eingezeichnet.</li>
+<li>Die dargestellten Informationen sind dieselben wie im 2d Beam-Pattern.</li>
+<li>Ich zeige es Ihnen, damit sie es mal gesehen haben.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org23fe198">
+<h2 id="org23fe198">Einfluss des Mikrofonabstands</h2>
+<p>
+
+</p>
+
+<div class="left-column" id="org75acfa8">
+<ul>
+<li>2 Mikrofone</li>
+<li>\(f=1000\) Hz</li>
+
+</ul>
+
+<div id="orgcdef7b5" class="figure">
+<p><img src="./plots/beamPattern_microphoneDistance_cartesian.svg" alt="beamPattern_microphoneDistance_cartesian.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+<div class="right-column" id="orgc550f77">
+
+<div id="org064bc36" class="figure">
+<p><img src="./plots/beamPattern_microphoneDistance_polar.svg" alt="beamPattern_microphoneDistance_polar.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+<aside class="notes">
+<ul>
+<li>Jetzt wo wir verstanden haben, welche Informationen ein Beam-Pattern liefert, können wir es nutzen, um den Einfluss <font color="red"> weiterer Parameter</font> unseres Beamformers zu betrachten.</li>
+<li>Wir haben gesehen, dass die <font color="red"> Richtwirkung essentiell von der Verzögerung zwischen zwei Mikrofonsignalen abhängt</font>.</li>
+<li>Diese Verzögerung hängt nicht nur vom Einfallswinkel ab, sondern auch vom <font color="red"> Abstand der Mikrofone</font></li>
+<li>Hier ist zu sehen, wie sich die Richtwirkung ändert wenn die Mikrofone <font color="red"> kleineren oder größeren Abstand</font> haben.</li>
+<li>Die blaue Kurve zeigt einen Mikrofonabstand von 10 cm. Die geringe Richtwirkung kommt dadurch zustande, dass der <font color="red"> Phasenunterschied zwischen zwei Mikrofonkanälen zu gering</font> ist, um stark destruktive Interferenz zu verursachen.</li>
+<li>Die orangene Kurve haben wir im letzten Beam-Pattern schon betrachtet.</li>
+<li>Die Grüne Kurve zeigt hier bereits bei einer Frequenz von 1 kHz die Grating Lobes.
+<ul>
+<li>Das liegt daran, dass der <font color="red"> Phasenunterschied zwischen zwei Mikrofonen zu groß</font> ist, und es bei bestimmten Richtungen zu <font color="red"> vollständig konstruktiver Interferenz</font> kommt.</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgdf88d5c">
+<h2 id="orgdf88d5c">Abhängigkeit von der Anzahl der Mikrofone</h2>
+<div class="left-column" id="org6563207">
+<ul>
+<li>20cm Mikrofonabstand (\(d=0,2\))</li>
+<li>\(f = 1000\) Hz</li>
+
+</ul>
+
+<div id="org6edfe32" class="figure">
+<p><img src="./plots/beamPattern_20cm_numberOfMicrophones_cartesian.svg" alt="beamPattern_20cm_numberOfMicrophones_cartesian.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+<div class="right-column" id="org47a0543">
+
+<div id="org53a5ccd" class="figure">
+<p><img src="./plots/beamPattern_20cm_numberOfMicrophones_polar.svg" alt="beamPattern_20cm_numberOfMicrophones_polar.svg" class="org-svg" />
+</p>
+</div>
+
+</div>
+
+<aside class="notes">
+<ul>
+<li>Der <font color="red"> letzte Parameter</font> unseres Beamformers, den wir uns ansehen wollen ist die Anzahl der Mikrofone.</li>
+<li>Wir erkennen: Eine Erhöhung der Mikrofonzahl hat <font color="red"> mehrere Effekte</font>:
+<ul>
+<li>Die <font color="red"> Breite der Hauptkeule</font> wird geringer</li>
+<li>Die <font color="red"> Breite der Sidelobes</font> wird ebenfalls geringer</li>
+<li>Allerdings nimmt die <font color="red"> Anzahl der Sidelobes</font> zu</li>
+
+</ul></li>
+<li>Die Gründe für dieses Verhalten werden wir <font color="red"> im Rahmen dieses Vortrags nicht betrachten</font>.
+<ul>
+<li>Nur soviel: Vielleicht kommt Ihnen dieses Verhalten: Schmalere Hauptkeule, mehr Nebenmaxima, bekannt vor.</li>
+<li>Es gibt hier eine <font color="red"> Analogie zum Spektrum eines Rechteckfensters</font>, das sie z.B. bei der Spektralanalyse von Signalen verwenden. Wenn sie das Fenster verlängern sehen sie genau diese Effekte.</li>
+<li>Aber dabei wollen wir es belassen.</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org3229eb1">
+<h2 id="org3229eb1">Steuerung des Beams</h2>
+
+<div id="orgab60047" class="figure">
+<p><img src="./bilder/beamformer/beamformer_rotateArray3_1.svg" alt="beamformer_rotateArray3_1.svg" class="org-svg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Wir wissen jetzt, wie man durch <font color="red"> Zusammenschaltung mehrere Mikrofone Schall von vorne verstärken</font>, und</li>
+<li>Schall aus anderen Richtungen dämpfen kann</li>
+<li>Die Signalverarbeitung bestand <font color="red"> bis jetzt aus einer Addition der Mikrofonsignale</font></li>
+<li>Gucken wir uns an, wie wir hinbekommen können, dass <font color="red"> Schall aus einer anderen Richtung</font> als vorne empfangen werden soll
+<ul>
+<li>Natürlich können wir das <font color="red"> Array drehen</font></li>
+<li>Hat aber Nachteile
+<ul>
+<li>Mechanischer Verschleiß</li>
+<li>Langsam</li>
+<li>Beispiel: Freisprechanlage an der Decke &#x2013; unpraktisch</li>
+
+</ul></li>
+<li>Das geht besser!</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org6b2e2ed">
+<h2 id="org6b2e2ed">Steuerung des Beams</h2>
+
+<div id="orgbba997e" class="figure">
+<p><img src="./bilder/beamformer/beamformer_steerBeam2_1.svg" alt="beamformer_steerBeam2_1.svg" class="org-svg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul>
+<li>Das Array ist hier <font color="red"> wieder in unserer gewohnten Richtung</font> orientiert.</li>
+<li>Wir wollen aber nun Schall von der Seite empfangen &#x2013; nicht von vorne.
+Wenn ich Ihnen dieses Bild zeige haben Sie sicherlich eine <font color="red"> Idee</font>.</li>
+<li>Meine Konkrete Frage lautet:
+<ul>
+<li>Durch was müssen die <font color="red"> Fragezeichen</font> ersetzt werden um das gezeigte Ausgangssignal zu erhalten?</li>
+
+</ul></li>
+<li>Die Verzögerung, die durch die Einfallsrichtung verursacht wird, muss ausgeglichen werden.</li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org88517a4">
+<h2 id="org88517a4">Beam-Steering</h2>
+<div id="main_app_5" style="width:1200px;height:400px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders_5" style="width:560px;height:200px;display:block;margin-left:auto;margin-right:auto;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+    let main_app_5 = new MainApp({target_main: "main_app_5", target_controls: "sliders_5", show_weights:true, show_delays: true, show_frequency:true})
+</script>
+
+<aside class="notes">
+<ul>
+<li>Wir sehen wieder unsere <font color="red"> bekannte Grafik</font>. Diesmal gibt es <font color="red"> einen weiteren Regler</font>.</li>
+<li>Mit diesem Regler lässt sich die sogenannte <font color="red"> "Steering"-Richtung</font> einstellen.</li>
+<li>Außerdem sehen Sie einen <font color="red"> Block</font>, gekennzeichnet mit &bdquo;-D&ldquo;.</li>
+<li>Dieser Block wird genutzt um das Signal <font color="red"> in der Zeit zu verschieben</font>. Da wir eine einzelne Frequenz betrachten entspricht dies einer <font color="red"> Drehung der Phase</font> des Signals.</li>
+<li>Ich stelle als erstes die Einfallsrichtung noch einmal so ein, dass das Signal vollständig unterdrückt wird.</li>
+<li>[59° einstellen]</li>
+<li>Beachten Sie, dass die Mikrofonsignale <font color="red"> vollständig phasenverdreht</font> übereinander liegen.</li>
+<li>Wenn ich die Steering-Richtung ändere, wird die <font color="red"> Phase des Signals so verändert</font>, dass die Signale wieder so übereinander liegen, dass es zu <font color="red"> konstruktiver Interferenz</font> kommt.</li>
+<li>Diese Phasendrehung <font color="red"> wirkt der durch die Einfallsrichtung verursachten Phasendrehung entgegen</font>.</li>
+<li>Als Konsequenz haben wir ungedämpfte Übertragung aus der Steering-Richtung.</li>
+<li>[0° einstellen] &#x2026; aber Dämpfung von vorne.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-frequency_domain_2">
+<h2 id="frequency_domain_2">Beam Steering &#x2013; Ausgangssignal</h2>
+<div class="left-column" id="orge552915">
+<p>
+Zeitbereich:
+  \[  \begin{eqnarray}
+    y_\color{red}{\text{s}}\left(t\right) &=& \sum_{m=0}^{M-1}w_m \cdot x_m\left(t+m\cdot\tau_\color{red}{s}\right)\\
+% &=& \sum_{m=0}^{M-1}(w_m\cdot \delta(t+ m \cdot \color{red}{\tau_s}))\ast x_m\left(t\right)\\
+% & = & \sum_{m=0}^{M-1}w_m \cdot s\left(t + m\cdot \color{red}{\tau_s}\right)\\
+%& = & \mathbf{w}^T\mathbf{x}(t)
+\end{eqnarray}\]
+</p>
+
+<p>
+mit
+</p>
+<ul>
+<li>\(\tau_\color{red}{\text{s}}\): Steering-Zeitversatz</li>
+
+</ul>
+
+</div>
+
+<div class="right-column" id="org9066c82">
+<p>
+Frequenzbereich:
+</p>
+<div>
+\begin{eqnarray}
+Y_\color{red}{\text{s}}(\omega) & = & \mathcal{F}\left\{y_\color{red}{\text{s}}(t)\right\}\\
+& = & \sum_{m=0}^{M-1}\left(w_m\cdot e^{+j\omega\cdot m\cdot \tau_\color{red}{s}}\right)\cdot X_m(\omega)\\
+% & = & \mathbf{W}_\color{red}{\text{s}}(\omega)^H\mathbf{X}(\omega)
+\end{eqnarray}
+
+</div>
+<p>
+mit
+</p>
+<ul>
+<li>\(e^{+j\omega\cdot m\cdot \tau_\color{red}{\text{s}}}\): Steering-Faktoren</li>
+
+</ul>
+
+</div>
+
+<aside class="notes">
+<ul>
+<li>Auch hier wollen wir uns die <font color="red"> mathematische Repräsentation</font> kurz ansehen.</li>
+<li>Das Ausgangssignal des gesteerten Beamformers, \(y_s\), kann ganz ähnlich wie das bisherige Ausgangssignal beschrieben werden: Als <font color="red"> gewichtete Überlagerung von Mikrofonsignalen</font>.</li>
+<li>Hier allerdings werden die Mikrofonsignale vor der Addition um den Steering-Zeitversatz \(\tau_s\) nicht verzögert sondern <font color="red"> nach vorne geschoben</font>.</li>
+<li>Der <font color="red"> Steering-Zeitversatz</font> hängt von der gewählten Steering-Richtung des Beamformers ab. Genau, wie wir es vorher für den Propagation-Zeitversatz gesehen haben.</li>
+<li>Aufgrund der Funktionsweise: Das zeitliche Verschieben der Mikrofonsignale und die anschließende Summation haben diesem Beamformer-Typ seinen Namen gegeben: <font color="red"> "Delay-and-Sum"</font>.</li>
+<li>Ein Vorziehen des Signals ist natürlich <font color="red"> nicht realisierbar</font>, da wir das Signal in der Zukunft noch nicht kennen.</li>
+<li>Im <font color="red"> Frequenzbereich</font> sieht es allerdings anders aus.</li>
+<li>Hier ergibt sich das Spektrum des Ausgangssignals zur Summe der Mikrofonsignale \(X_m\), jeweils gewichtet mit den Gewichtungsfaktoren und den durch das Vorziehen des Signals entstehenden Phasentermen.</li>
+<li>Im Frequenzbereich ist es kein Problem, die Phase in die andere Richtung zu drehen. Das liegt daran, dass die Fourier-Transformation das Signal in <font color="red"> reine harmonische Schwingungen</font> zerlegt hat.</li>
+<li>Auf diese Weise wirken die Steering-Faktoren den durch die Einfallsrichtung verursachten Propagation-Faktoren <font color="red"> genau entgegen und kompensieren diese</font>.</li>
+<li>Diese komplexen Exponentialterme kann man sich als <font color="red"> Vektor auf der Gaußschen Zahlenebene</font> vorstellen. Der Betrag ist eins und der <font color="red"> Winkel hängt von der Frequenz</font>.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-weights_demo">
+<h2 id="weights_demo">Einfluss der Gewichte</h2>
+<div id="rectPlot" style="width:900px;height:500px;display:block;margin-left:auto;margin-right:auto;"></div>
+<div id="sliders" style="width:560px;height:300px;display:block;margin-left:auto;margin-right:auto;"></div>
+<!-- <div id="polarPlot" style="width:1000px;height:350px;display:block;margin-left:auto;margin-right:auto"></div> -->
+<script>
+     weights_app()
+</script>
+
+<aside class="notes">
+<ul>
+<li>Hier ist das Beam-Pattern eines Beamformers mit <font color="red"> vier Mikrofonen</font> dargestellt
+<ul>
+<li>Oben das Beam-Pattern</li>
+<li>In den vier Kreisen sind die <font color="red"> Phasendrehungen in der Gaußschen Zahlenebene</font> dargestellt</li>
+
+</ul></li>
+<li>WIr können die Einfallsrichtung ändern&#x2026;
+<ul>
+<li>Jedes Mikrofonsignal ist verzögert, entsprechend einer Phasendrehung im Frequenzbereich</li>
+
+</ul></li>
+<li>Wir können aber auch die Gewichte ändern
+<ul>
+<li>Das ist hier dargestellt mit einer Änderung des Betrags des komplexen Zeigers</li>
+
+</ul></li>
+<li>Durch eine Veränderung der Gewichte können wir das Beam-Pattern ändern
+<ul>
+<li>Wenn ich nichts mache entspricht das Ganze einem grundlegenden Beamformer, wie wir ihn als erstes kennengelernt haben</li>
+<li>Wenn ich drei Gewichte auf Null setze haben wir keinen Beamformer mehr sondern nur noch ein Mikrofon
+<ul>
+<li>Es gibt keine Richtwirkung mehr</li>
+<li>Das Signal wird um ca. 12 dB gedämpft, da auf vier Mikrofone normalisiert wird</li>
+
+</ul></li>
+<li>Mit zwei Gewichten auf 1 entspricht das Ganze einem Beamformer mit zwei Mikrofonen</li>
+<li>Interessant wird es, wenn ich Gewichte zwischen 0 und 1 setze
+<ul>
+<li>Achten sie drauf:
+<ul>
+<li>Wenn ich Gewichte verkleinere wird schonmal die Hauptkeule breiter</li>
+<li>Und: Die Nebenkeulen werden niedriger</li>
+
+</ul></li>
+
+</ul></li>
+<li>Zum Beispiel kann ich Gewichte wählen, die die Nebenkeulen niedriger machen
+<ul>
+<li>&#x2026;und nehme dafür eine breitere Hauptkeule in Kauf</li>
+
+</ul></li>
+
+</ul></li>
+<li>Das aber nur als Beispiel, welche <font color="red"> weiteren Untersuchungen</font> mit Beamformern möglich sind.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org37fafbb">
+<h2 id="org37fafbb">Anwendungen</h2>
+<div class="outline-text-2" id="text-org37fafbb">
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org1816f59" data-state="no-toc-progress">
+<h3 id="org1816f59">Freisprech-Kopfhörer</h3>
+
+<div id="org9103047" class="figure">
+<p><img src="./bilder/im_alltag/sony_headphones.png" alt="sony_headphones.png" />
+</p>
+<p><span class="figure-number">Abbildung 1: </span>Beamforming im Freisprech-Kopfhörer (<a href="#citeproc_bib_item_3">Sony Deutschland</a>)</p>
+</div>
+<aside class="notes">
+<ul>
+<li>Hier sind zwei Mikrofone zu sehen</li>
+<li>Wir haben <font color="red"> im Vortrag gesehen</font>, wie diese <font color="red"> Mikrofone zusammengeschaltet</font> werden können um Signale aus der Richtung des Munds zu übertragen und störende Signale aus anderen Richtungen zu dämpfen.</li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orga60f609" data-state="no-toc-progress">
+<h3 id="orga60f609">Konferenz-Freisprechanlage</h3>
+
+<div id="orga9e630b" class="figure">
+<p><img src="./bilder/im_alltag/sennheiser_teamConnect.png" alt="sennheiser_teamConnect.png" />
+</p>
+<p><span class="figure-number">Abbildung 2: </span>Sennheiser TeamConnect Ceiling 2 (<a href="#citeproc_bib_item_2">Sennheiser 2023</a>)</p>
+</div>
+<aside class="notes">
+<ul>
+<li>Zuletzt eine weitere Anwendung für Mikrofonbeamforming
+<ul>
+<li>Ein <font color="red"> Konferenzsystem</font></li>
+
+</ul></li>
+<li>Mikrofone in <font color="red"> x-Form</font> angeordnet</li>
+<li>Man hängt sich einen solchen Kasten an die Decke</li>
+<li>Dieser Beamformer kann dann auf einen <font color="red"> Sprecher ausgerichtet</font> werden</li>
+<li>Auch hier geht es darum Störgeräusche zu unterdrücken, und das Signal vom gewünschten Sprecher zu übertragen.</li>
+<li>Natürlich müssen wir wissen, wo der Sprecher sich befindet.
+<ul>
+<li>Auch dafür gibt es Lösungen. Beispielsweise können sie einen Beamformer, wie wir ihn kennengelernt haben, nutzen, um den Raum abzutasten und zu ermitteln, von wo am meisten Leistung kommt.</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org3b58e47">
+<h3 id="org3b58e47">Lautsprecherbeamforming</h3>
+
+<div id="orgcb7766b" class="figure">
+<p><img src="./bilder/im_alltag/fohhn_concert.jpg" alt="fohhn_concert.jpg" />
+</p>
+<p><span class="figure-number">Abbildung 3: </span>Beamforming im Konzertsaal (<a href="#citeproc_bib_item_1">Fohhn Audio AG</a>)</p>
+</div>
+<aside class="notes">
+<ul>
+<li>In diesem letzten Bild dieses Vortrags geht es ausnahmsweise nicht um Mikrofonbeamforming.</li>
+<li>Hier ist Lautsprecherbeamforming zu sehen. Es geht also ums <font color="red"> Senden</font>.</li>
+<li>Beamformer können hier verwendet werden, um den Schall gezielt auf bestimmte Bereiche zu lenken. Das hat Vorteile:
+<ul>
+<li><font color="red"> Ungewünschte Reflexionen werden reduziert</font> &#x2013; zum Beispiel an Wänden und der Decke, und an den Balkonen</li>
+<li>Es wird <font color="red"> weniger Leistung</font> benötigt, da die &bdquo;Lücken&ldquo; in der Abstrahlcharacteristik keine (ungenutzte) Leistung verbrauchen</li>
+
+</ul></li>
+
+</ul>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-orgddb6518">
+<h2 id="orgddb6518">Zusammenfassung</h2>
+<p>
+Mikrofonbeamformer&#x2026;
+</p>
+<ul>
+<li>sind <font color="blue"> räumliche Filter</font></li>
+<li>nutzen <font color="blue"> Interferenz</font>
+<ul>
+<li>Signale aus unterschiedlichen Richtungen werden konstruktiv oder destruktiv überlagert</li>
+
+</ul></li>
+<li>haben <font color="blue"> frequenzabhängige Richtwirkung</font></li>
+<li>unterliegen <font color="blue"> Spatial Aliasing</font>
+<ul>
+<li>in Abhängigkeit von Frequenz und Mikrofonabstand können zwei Richtungen nicht voneinander unterschieden werden</li>
+
+</ul></li>
+<li>lassen sich durch <font color="blue"> Phasendrehung</font> der Mikrofonsignale in eine Vorzugsrichtung steuern</li>
+<li>werden vielfältig verwendet, um die <font color="blue"> Qualität von Sprachübertragung</font> zu verbessern und zur <font color="blue"> Unterdrückung von Störquellen</font></li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org73b59b3">
+<h2 id="org73b59b3">Ausblick</h2>
+<ul>
+<li><font color="blue"> Implementierung</font> eines funktionierenden Beamformers, zum Beispiel in Python
+<ul>
+<li>Übertragung der betrachteten Lösungen in den diskreten Frequenzbereich</li>
+<li>Signalverarbeitung im Rahmen eines <font color="blue"> short-time Fourier transform (STFT)</font> Frameworks</li>
+
+</ul></li>
+<li>Untersuchung weiterer Arraytopologien</li>
+<li>Untersuchung weiterer Beamformertypen</li>
+
+</ul>
+
+
+
+<div id="org038060f" class="figure">
+<p><img src="./bilder/tools/qr-code.svg" alt="qr-code.svg" class="org-svg" style="position:absolute;top:400px;right:-20px;width:400px;height:400px;" />
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-bibliography">
+<h2 id="bibliography" class="no-toc-progress">Bildquellen</h2>
+<style>.csl-entry{text-indent: -1.5em; margin-left: 1.5em;}</style><div class="csl-bib-body">
+  <div class="csl-entry"><a id="citeproc_bib_item_1"></a>Fohhn Audio AG. “Fohhn Beam Steering Technology.” Accessed March 28, 2025. <a href="https://www.fohhn.com/en/technologies/fohhn-beam-steering-technology">https://www.fohhn.com/en/technologies/fohhn-beam-steering-technology</a>.</div>
+  <div class="csl-entry"><a id="citeproc_bib_item_2"></a>Sennheiser. 2023. “Broschüre ‘TeamConnect Ceiling Solutions’.”</div>
+  <div class="csl-entry"><a id="citeproc_bib_item_3"></a>Sony Deutschland. “WH-CH720N Kabelloses Noise Cancelling.” Accessed March 23, 2025. <a href="https://www.sony.de/headphones/products/wh-ch720n/features4">https://www.sony.de/headphones/products/wh-ch720n/features4</a>.</div>
+</div>
+</section>
+</section>
+</div>
+</div>
+<script src="./libs/reveal.js/dist/reveal.js"></script>
+<script src="./libs/reveal.js/plugin/highlight/highlight.js"></script>
+<script src="./libs/reveal.js/plugin/notes/notes.js"></script>
+<script src="./libs/reveal.js/plugin/zoom/zoom.js"></script>
+<script src="./libs/reveal.js/plugin/math/math.js"></script>
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+mouseWheel: false,
+fragmentInURL: false,
+hashOneBasedIndex: false,
+pdfSeparateFragments: true,
+overview: true,
+width: 1500,
+minScale: 1.00,
+maxScale: 1.00,
+
+transition: 'none',
+transitionSpeed: 'default',
+
+// Plugins with reveal.js 4.x
+plugins: [ RevealHighlight, RevealNotes, RevealZoom, RevealMath ],
+
+// Optional libraries used to extend reveal.js
+dependencies: [
+{src: 'plugins/toc-progress/toc-progress.js', async: true, callback: function(){toc_progress.initialize(undefined, 'rgba(255, 255, 255, 0', 'body', false); toc_progress.create();}}]
+
+,plugins: [ RevealHighlight, RevealNotes, RevealZoom, RevealMath, RevealAnimate ]});
+</script>
+</body>
+</html>

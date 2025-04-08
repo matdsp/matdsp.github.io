@@ -1,0 +1,23 @@
+<head>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+	<script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+
+	<!-- <script src="beampattern.js"></script> -->
+	<script src="main_app.js"></script>
+	<style>
+		plot-container {
+			display: block;
+			margin: auto;
+			width: 100px;
+			height: 100px;
+		}
+	</style>
+</head>
+<body>
+	<!-- <div id="incomingWave" style="width:300px;height:300px;"></div> -->
+	<div id="beamformer" style="width:800px;height:800px"></div>
+	<div id="sliders"></div>
+	<script>
+		let x = new MainApp({target_main: "beamformer", target_controls: "sliders", show_weights: true, show_delays: true, show_frequency: false})
+	</script>
+</body>

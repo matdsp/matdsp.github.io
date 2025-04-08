@@ -1,0 +1,47 @@
+\documentclass{modern}
+\usepackage{float} % stops images from moving around
+\floatplacement{figure}{H}
+
+\providecommand{\tightlist}{
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+}
+
+\def\toprule{}
+\def\bottomrule{}
+\def\midrule{}
+
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
+$if(title)$
+\title{$title$}
+$endif$
+$if(author)$
+\author{$author$}
+$endif$
+\date{\today}
+
+\title{asdf}
+\author{me}
+
+$if(print-numbers)$
+$else$
+  \resetthesectinos
+$endif$
+
+\begin{document}
+
+
+$if(title)$
+\maketitle
+$endif$
+
+$if(toc)$
+\tableofcontents
+$endif$
+
+$body$
+
+\end{document}

@@ -1,0 +1,126 @@
+.reveal img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 600px;
+}
+
+.left-column {
+  width: 50%;
+  float: left;
+}
+
+.right-column {
+  width: 50%;
+  float: right;
+}
+
+.org-center {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.full-center {
+  margin: 0;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.inline-figure {
+  justify-content: center;
+  align-items: center;
+}
+
+.figure {
+  display: block;
+  text-align: center;
+}
+
+.sourcefile {
+  text-align: right;
+  padding-right: 6%;
+  position: relative;
+  top: 50px;
+  font-size: 20px;
+  color: lightgrey;
+  z-index: 1;
+}
+
+/* switch off figure numbers until I find out how to continue counting across sections */
+.figure-number {
+  display: none;
+}
+
+/* for fancy flashing of things */
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hidden-fragment.visible:not(.current-fragment) {
+  display: none;
+  height: 0px;
+  line-height: 0px;
+  font-size: 0px;
+}
+
+.reveal blockquote {
+  width: 80%;
+  margin: 50px auto;
+  font-style: normal;
+  padding: 1.2em 30px 1.2em 75px;
+  line-height: 1.6;
+  position: relative;
+  background: #AAAAAA;
+}
+
+.reveal blockquote::before {
+  content: "ⓘ";
+  color: #FFFFFF;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+.reveal blockquote::after {
+  content: '';
+}
+
+a.forwardlink {
+  color: black
+}
+
+.reveal a {
+  color: black
+}
+
+.fragment.bold.visible {
+  font-weight: bold;
+}
+
+.hidden-title {
+  display: none;
+}
+
+/* Disable vertical centering for slides with .no-center */
+.reveal section .top-align {
+  align-self: flex-start !important;
+  margin-top: 0 !important;
+  margin-bottom: auto !important;
+  top: 0 !important;
+  transform: none !important;
+  position: relative !important;
+}
+
+.reveal h2 {
+  font-size: var(--r-heading3-size);
+}
