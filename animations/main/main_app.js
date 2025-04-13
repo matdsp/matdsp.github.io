@@ -119,15 +119,7 @@ function create_weight_multiplier_shape_data(x, y, radius, microphone_index) {
             y0: y,
             x1: x - radius,
             y1: y
-        },
-        // {
-        //     // line to weight label
-        //     type: 'line',
-        //     x0: x,
-        //     y0: y + radius,
-        //     x1: x,
-        //     y1: y + 1
-        // }
+        }
     ]
 
     let annotations = {
@@ -145,10 +137,6 @@ function create_weight_multiplier_shape_data(x, y, radius, microphone_index) {
         text: "",
         arrowwidth: 2,
         arrowcolor: "black"
-        // line:
-        // {
-        //     color:"green"
-        // }
     }
 
     return { traces: traces, shapes: shapes, annotations: [annotations] }
@@ -166,7 +154,6 @@ function create_delay_shape_data(x, y, path_index) {
             textfont:
             {
                 size: 26,
-                //weight: "bold"
             }
         }
     ]
@@ -356,11 +343,9 @@ function compute_signals(vec_t, f, tau_propagation, tau_steering, parameters) {
     const phi_propagation = 2 * Math.PI * f * tau_propagation
     const phi_steering = 2 * Math.PI * f * tau_steering
 
-
     // microphone signals
     let microphone_1_signal = sine_vec(vec_t, f, 0)
     let microphone_2_signal = sine_vec(vec_t, f, phi_propagation)
-
 
     // delayed signals
     const phi = phi_propagation - phi_steering
@@ -410,10 +395,6 @@ class SteeringVector {
             text: "",
             arrowwidth: 2,
             arrowcolor: "blue"
-            // line:
-            // {
-            //     color:"green"
-            // }
         }
 
         this.my_annotations = [annotations]
@@ -467,7 +448,6 @@ class BeamformerPlot {
         const adder_data = create_adder_block_data(5 + 7 + 0.75 + adder_offset, 2.5)
 
         this.output_signal = new OutputSignal(vec_t, signals.sum, 5.5 + 7 + 0.75 + adder_offset, 2.5, stretch_factor)
-
 
         let layout = {
             xaxis: {
@@ -620,7 +600,6 @@ class IncomingWave {
                 {
                     color: "green"
                 }
-
             }
         ]
 
@@ -640,10 +619,6 @@ class IncomingWave {
             text: "",
             arrowwidth: 2,
             arrowcolor: "green"
-            // line:
-            // {
-            //     color:"green"
-            // }
         }
 
         this.my_traces = [line]
@@ -696,11 +671,6 @@ class IncomingWave {
 
 class MainApp {
     constructor(parameters) {
-        // data = {}
-
-        // parameters
-        // const f = 1000
-
         const stretch_factor = 2000
 
         // incoming wave
@@ -727,7 +697,6 @@ class MainApp {
 
         // incoming wave
         const vec_t_incoming = linspace(0, T_incoming, N_t_incoming)
-        // let s = Array.from(vec_t_incoming, (t) => Math.sin(2 * Math.PI * f * t))
 
         // rest
         const vec_t_beamformer = linspace(0, T_beamformer, N_t_beamformer)
@@ -766,6 +735,5 @@ class MainApp {
                 Plotly.redraw(parameters.target_main)
             })
         }
-
     }
 }

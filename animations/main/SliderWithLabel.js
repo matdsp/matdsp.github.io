@@ -20,8 +20,6 @@ class SliderWithLabel {
         this.my_slider.max = max
         this.my_slider.value = value
         this.my_slider.step = step
-        // this.my_slider.id = name + "_slider"
-
 
         if (direction == "vertical")
         {
@@ -36,7 +34,6 @@ class SliderWithLabel {
 
         // value label
         var span_label = document.createElement("span")
-        // span_label.id = name + "_label"
         span_label.style = "display:inline-flex;width:20px;font-size:30px;"
         this.my_element.appendChild(span_label)
 

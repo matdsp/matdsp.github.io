@@ -4,82 +4,10 @@ function linspace(start, stop, num, endpoint = true) {
 	return Array.from({ length: num }, (_, i) => start + step * i);
 }
 
-// class SliderWithLabel {
-// 	constructor(name, min, max, value, direction, step) {
-// 		this.my_element = document.createElement("div")
-// 		this.my_element.className = "test"
-// 		//this.my_element.style="display:inline-grid;"
-// 		// this.my_element.style = "width: 80%;"
-
-// 		if (name)
-// 		{
-// 			// label
-// 			var label = document.createElement("span")
-// 			label.append(name)
-// 			this.my_element.appendChild(label)
-// 		}
-
-// 		// slider
-// 		this.my_slider = document.createElement("input")
-// 		this.my_slider.type = "range"
-// 		this.my_slider.className = "slider"
-// 		this.my_slider.value = value
-// 		this.my_slider.min = min
-// 		this.my_slider.max = max
-// 		this.my_slider.step = step
-// 		this.my_slider.id = name + "_slider"
-
-
-// 		if (direction == "vertical")
-// 		{
-// 			this.my_slider.style = "writing-mode:tb;direction:rtl;height:100px;"
-// 		}
-// 		else
-// 		{
-// 			this.my_slider.style = "width: 80%;"
-// 		}
-
-// 		this.my_element.appendChild(this.my_slider)
-
-// 		// value label
-// 		var span_label = document.createElement("span")
-// 		span_label.id = name + "_label"
-// 		span_label.style = "display:inline-flex;width:20px"
-// 		this.my_element.appendChild(span_label)
-
-// 		// update the label
-// 		this.my_slider.addEventListener("input", function () {
-// 			span_label.textContent = Number(this.value).toFixed(Math.log10(1 / step))
-// 		})
-
-// 		// display initial value
-// 		span_label.textContent = Number(this.value).toFixed(Math.log10(1 / step))
-// 	}
-
-// 	get element() {
-// 		return this.my_element;
-// 	}
-
-// 	get slider() {
-// 		return this.my_slider;
-// 	}
-
-// 	get value() {
-// 		return this.slider.value;
-// 	}
-// }
-
 class WeightPlot {
 	constructor(M, data) {
 		this.my_element = document.createElement("div")
 		this.my_element.style = "float:left;"
-
-		// label
-		// var label = document.createElement("span")
-		// label.append(name)
-		// this.my_element.appendChild(label)
-
-
 
 		var polarLayout = {
 			autosize: true,
@@ -155,8 +83,6 @@ class WeightPlot {
 			plotContainer.style = "width:120px;height:120px;"
 			weightControl.appendChild(plotContainer)
 
-			
-
 			this.my_element.appendChild(weightControl)
 
 			var config = {
@@ -164,7 +90,6 @@ class WeightPlot {
 			}
 
 			slider.slider.addEventListener("input", function (microphone_index, data, container, target) {
-				// console.log(microphone_index, data)//this.value, data, microphone_index)
 				data.polarData[microphone_index][0].r[1] = Number(target.target.value)
 				Plotly.redraw(container)
 			}.bind(null, microphone_index, data, plotContainer))
@@ -203,12 +128,6 @@ class WeightPlot {
 	}
 }
 
-function reset()
-{
-
-}
-
-
 function weights_app() {
 	const d = .2 // microphone distance
 	const M = 4 // number of microphones
@@ -226,7 +145,7 @@ function weights_app() {
 	// beam pattern plot
 	var line = {
 		x: theta_degrees,
-		y: calculate_beam_pattern(d, M, f, c, theta, 0, cur_weights)[0],//Array.from({length: theta.length}, (v,k) => k +1),
+		y: calculate_beam_pattern(d, M, f, c, theta, 0, cur_weights)[0],
 		type: "scatter"
 	}
 
